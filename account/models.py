@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 
 ROLE_CHOICE = (
-    ('restaurant', 'Restaurant'),
+    ('vendor', 'Vendor'),
     ('customer', 'Customer'),
 )
 
