@@ -2,24 +2,11 @@ from django.shortcuts import redirect, render
 from account.forms import UserSignupForm
 from account.models import User, UserProfile
 from django.contrib import auth, messages
-from account.utils import detect_user
+from account.utils import detect_user, send_email, is_customer, is_vendor
 from vendor.forms import VendorSignupForm
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.core.exceptions import PermissionDenied
-
-
-def is_customer(user):
-    """Returns True if the user us is customer"""
-    if user.role == 'customer':
-        return True
-    raise PermissionDenied
-
-
-def is_vendor(user):
-    """Returns True if the user us is vendor"""
-    if user.role == 'vendor':
-        return True
-    raise PermissionDenied
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
 
 
 def user_signup(request):
@@ -43,6 +30,9 @@ def user_signup(request):
             )
             user.role = 'customer'
             user.save()
+            mail_subject = 'Activate your account'
+            email_template = 'account/email/account-verification.html'
+            send_email(request, mail_subject, email_template, user)
             messages.success(request, 'Your account has been created successfully')
             return redirect('user-signup')
     else:
@@ -80,6 +70,9 @@ def vendor_signup(request):
             user_profile = UserProfile.objects.get(user=user)
             vendor.user_profile = user_profile
             vendor.save()
+            mail_subject = 'Activate your account'
+            email_template = 'account/email/account-verification.html'
+            send_email(request, mail_subject, email_template, user)
             messages.success(request, 'Your account has been created successfully')
             return redirect('vendor-signup')
     else:
@@ -90,6 +83,66 @@ def vendor_signup(request):
         'vendor_form': vendor_form,
     }
     return render(request, 'account/vendor-signup.html', context)
+
+
+def activate(request, uidb64, token):
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = User._default_manager.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    if user is not None and default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        messages.success(request, 'Your account is activated')
+        return redirect('dashboard')
+    messages.error(request, 'Invalid activation link')
+    return redirect('dashboard')
+
+
+def forgot_password(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        if User.objects.filter(email=email).exists():
+            user = User.objects.get(email__exact=email)
+            mail_subject = 'Reset your account password'
+            email_template = 'account/email/reset-password.html'
+            send_email(request, mail_subject, email_template, user)
+            messages.success(request, 'Password reset link has been sent')
+            return redirect('signin')
+        messages.error(request, 'Account does not exist')
+        return redirect('forgot-password')
+    return render(request, 'account/forgot-password.html')
+
+
+def reset_password_validate(request, uidb64, token):
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = User._default_manager.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    if user is not None and default_token_generator.check_token(user, token):
+        request.session['uid'] = uid
+        messages.info(request, 'Reset your password')
+        return redirect('reset-password')
+    messages.error(request, 'Link expired')
+    return redirect('dashboard')
+
+
+def reset_password(request):
+    if request.method == 'POST':
+        password = request.POST.get('password')
+        password2 = request.POST.get('password2')
+        if password == password2:
+            pk = request.session.get('uid')
+            user = User.objects.get(pk=pk)
+            user.set_password(password)
+            user.save()
+            messages.success(request, 'Passwords reset successful')
+            return redirect('signin')
+        messages.error(request, 'Passwords do not match')
+        return redirect('reset-password')
+    return render(request, 'account/reset-password.html')
 
 
 def signin(request):
