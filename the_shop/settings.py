@@ -66,6 +66,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'account.context_processors.get_vendor',
+                'account.context_processors.get_google_api',
             ],
         },
     },
@@ -159,3 +161,7 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 EMAIL_BACKEND = config('EMAIL_BACKEND')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
+
+
+# Google api key configuration
+GOOGLE_API_KEY = config('GOOGLE_API_KEY')

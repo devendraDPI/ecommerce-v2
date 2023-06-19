@@ -3,7 +3,7 @@ from account.forms import UserSignupForm
 from account.models import User, UserProfile
 from django.contrib import auth, messages
 from account.utils import detect_user, send_email, is_customer, is_vendor
-from vendor.forms import VendorSignupForm
+from vendor.forms import VendorForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
@@ -49,7 +49,7 @@ def vendor_signup(request):
         return redirect('dashboard')
     if request.method == 'POST':
         form = UserSignupForm(request.POST)
-        vendor_form = VendorSignupForm(request.POST, request.FILES)
+        vendor_form = VendorForm(request.POST, request.FILES)
         if form.is_valid() and vendor_form.is_valid():
             username = form.cleaned_data['username']
             first_name = form.cleaned_data['first_name']
@@ -77,7 +77,7 @@ def vendor_signup(request):
             return redirect('vendor-signup')
     else:
         form = UserSignupForm()
-        vendor_form = VendorSignupForm()
+        vendor_form = VendorForm()
     context = {
         'form': form,
         'vendor_form': vendor_form,
