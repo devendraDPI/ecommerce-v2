@@ -29,7 +29,7 @@ class Category(BaseModel):
 
 class Product(BaseModel):
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='productitems')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='product')
     name = models.CharField(max_length=256)
     slug = models.SlugField(max_length=512, unique=True)
     description = models.TextField(max_length=16384, blank=True)

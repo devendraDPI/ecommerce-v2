@@ -7,6 +7,7 @@ from vendor.forms import VendorForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
+from django.template.defaultfilters import slugify
 
 
 def user_signup(request):
@@ -67,6 +68,8 @@ def vendor_signup(request):
             user.save()
             vendor = vendor_form.save(commit=False)
             vendor.user = user
+            name = vendor_form.cleaned_data['name']
+            vendor.slug = f'{slugify(name)}-{user.id}'
             user_profile = UserProfile.objects.get(user=user)
             vendor.user_profile = user_profile
             vendor.save()
