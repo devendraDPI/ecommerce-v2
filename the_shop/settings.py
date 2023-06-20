@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'account.apps.AccountConfig',
     'vendor.apps.VendorConfig',
     'product.apps.ProductConfig',
+    'marketplace.apps.MarketplaceConfig',
 ]
 
 MIDDLEWARE = [
