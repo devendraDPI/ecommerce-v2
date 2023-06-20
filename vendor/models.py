@@ -9,6 +9,7 @@ class Vendor(models.Model):
     name = models.CharField(max_length=128)
     slug = models.SlugField(max_length=256, unique=True)
     license = models.ImageField(upload_to='vendor/license')
+    is_featured = models.BooleanField(default=False)
     is_approved = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
