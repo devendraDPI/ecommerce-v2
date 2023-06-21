@@ -19,6 +19,7 @@ from django.urls import include, path
 from the_shop import views
 from django.conf.urls.static import static
 from django.conf import settings
+from marketplace import views as marketplace_views
 
 
 urlpatterns = [
@@ -26,6 +27,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('account/', include('account.urls')),
     path('marketplace/', include('marketplace.urls')),
+    path('cart/', marketplace_views.cart, name='cart'),
 ]
 
 

@@ -1,5 +1,32 @@
 {% extends 'base.html' %}
 {% block title %}The Shop{% endblock title %}
 {% block content %}
-  {% include 'includes/carousel.html' %}
+  <div class="container-fluid">
+    {% include 'includes/carousel.html' %}
+    <div class="container-fluid my-2">
+      <h2>Vendors</h2><hr>
+      <div class="row">
+        {% for vendor in vendors %}
+          <div class="col-md-4">
+            <div class="card shadow-sm text-bg-dark my-2">
+              <img src="{{ vendor.user_profile.cover_image.url }}" class="card-img" width="100%" alt="vendor cover image" style="filter: brightness(40%);">
+              <div class="card-img-overlay">
+                <div class="row">
+                  <div class="col-md-2 text-center">
+                    <a href="{% url 'vendor-details' vendor.slug %}"><img src="{{ vendor.user_profile.profile_image.url }}" height="60px" width="60px" class="rounded-pill" alt="vendor logo"></a>
+                  </div>
+                  <div class="col-md-10">
+                    <a href="{% url 'vendor-details' vendor.slug %}" class="text-white" style="text-decoration: none;"><h5 class="card-title">{{ vendor.name }}</h5></a>
+                    {% if vendor.user_profile.city and vendor.user_profile.state and vendor.user_profile.pin_code %}
+                      <span><i class="bi bi-geo-alt"></i> {{ vendor.user_profile.city }}, {{ vendor.user_profile.state }} - {{ vendor.user_profile.pin_code }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
 {% endblock content %}
