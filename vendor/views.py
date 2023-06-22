@@ -71,7 +71,8 @@ def add_category(request):
             name = form.cleaned_data['name']
             new_category = form.save(commit=False)
             new_category.vendor = get_vendor(request)
-            new_category.slug = slugify(name)
+            new_category.save()
+            new_category.slug = f'{slugify(name)}-{new_category.id}'
             new_category.save()
             messages.success(request, 'Category added')
             return redirect('category')
@@ -126,7 +127,8 @@ def add_product(request):
             name = form.cleaned_data['name']
             new_product = form.save(commit=False)
             new_product.vendor = get_vendor(request)
-            new_product.slug = slugify(name)
+            new_product.save()
+            new_product.slug = f'{slugify(name)}-{new_product.id}'
             new_product.save()
             messages.success(request, 'Product added')
             return redirect('products-by-category', new_product.category.id)

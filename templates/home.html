@@ -4,6 +4,43 @@
   <div class="container-fluid">
     {% include 'includes/carousel.html' %}
     <div class="container-fluid my-2">
+      <div class="container bg-dark rounded-pill shadow" style="width: 80%;">
+        <nav class="navbar">
+          <form class="container-fluid" action="{% url 'search' %}" method="GET">
+            <div class="row input-group g-2">
+              <div class="col-md-5">
+                <input type="text" name="q" class="form-control" placeholder="product, category, vendor">
+              </div>
+              <div class="col-md-5">
+                <div class="select-location">
+                  <input type="text" name="address" class="form-control" id="id_address" placeholder="search by location*" required>
+                  <input type="hidden" name="lat" value="" id="id_latitude">
+                  <input type="hidden" name="lng" value="" id="id_longitude">
+                </div>
+              </div>
+              <div class="col-md-1">
+                <select class="form-control" name="radius" id="radius" required>
+                  <option value="" selected>radius</option>
+                  <option value="1">1km</option>
+                  <option value="2">2km</option>
+                  <option value="3">3km</option>
+                  <option value="4">4km</option>
+                  <option value="5">5km</option>
+                  <option value="10">10km</option>
+                  <option value="15">15km</option>
+                  <option value="25">25km</option>
+                  <option value="50">50km</option>
+                  <option value="75">75km</option>
+                  <option value="100">100km</option>
+                </select>
+              </div>
+              <div class="col-md-1">
+                <button class="btn btn-dark rounded-pill"><i class="bi bi-search"></i></button>
+              </div>
+            </div>
+          </form>
+        </nav>
+      </div>
       <h2>Vendors</h2><hr>
       <div class="row">
         {% for vendor in vendors %}
@@ -17,6 +54,9 @@
                   </div>
                   <div class="col-md-10">
                     <a href="{% url 'vendor-details' vendor.slug %}" class="text-white" style="text-decoration: none;"><h5 class="card-title">{{ vendor.name }}</h5></a>
+                    {% if vendor.kms %}
+                      <span class="badge bg-info-subtle border border-info-subtle text-info-emphasis rounded-pill text-start"><small>{{ vendor.kms }} km away</small></span><br>
+                    {% endif %}
                     {% if vendor.user_profile.city and vendor.user_profile.state and vendor.user_profile.pin_code %}
                       <span><i class="bi bi-geo-alt"></i> {{ vendor.user_profile.city }}, {{ vendor.user_profile.state }} - {{ vendor.user_profile.pin_code }}</span>
                     {% endif %}
