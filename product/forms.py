@@ -36,3 +36,4 @@ class ProductForm(forms.ModelForm):
         self.fields['name'].widget.attrs['class'] = 'form-control my-2'
         self.fields['description'].widget.attrs['class'] = 'form-control my-2'
         self.fields['price'].widget.attrs['class'] = 'form-control my-2'
+        self.fields['is_available'].widget.attrs['class'] = 'form-check-input'

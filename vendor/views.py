@@ -1,10 +1,12 @@
+from django.db import IntegrityError
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from account.models import UserProfile
 from product.forms import CategoryForm, ProductForm
 from product.models import Category, Product
-from vendor.forms import VendorForm
+from vendor.forms import VendorForm, OpeningHourForm
 from account.forms import UserProfileForm
-from vendor.models import Vendor
+from vendor.models import OpeningHour, Vendor
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from account.utils import is_vendor
@@ -174,3 +176,77 @@ def delete_product(request, pk=None):
     product.delete()
     messages.success(request, 'Product deleted')
     return redirect('products-by-category', product.category.id)
+
+
+@login_required(login_url='signin')
+@user_passes_test(is_vendor)
+def operating_hours(request):
+    operating_hours_ = OpeningHour.objects.filter(vendor=get_vendor(request))
+    form = OpeningHourForm()
+    context = {
+        'form': form,
+        'operating_hours': operating_hours_,
+    }
+    return render(request, 'vendor/operating-hours.html', context)
+
+
+@login_required(login_url='signin')
+@user_passes_test(is_vendor)
+def add_operating_hours(request):
+    if request.user.is_authenticated:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest' and request.method == 'POST':
+            day = request.POST.get('day')
+            from_hour = request.POST.get('from_hour')
+            to_hour = request.POST.get('to_hour')
+            is_closed = request.POST.get('is_closed')
+            try:
+                hour = OpeningHour.objects.create(
+                    vendor=get_vendor(request),
+                    day=day,
+                    from_hour=from_hour,
+                    to_hour=to_hour,
+                    is_closed=is_closed,
+                )
+                if hour:
+                    day = OpeningHour.objects.get(id=hour.id)
+                    if day.is_closed:
+                        response = {
+                            'status': 'Success',
+                            'id': hour.id,
+                            'day': day.get_day_display(),
+                            'is_closed': 'Closed',
+                        }
+                    else:
+                        response = {
+                            'status': 'Success',
+                            'id': hour.id,
+                            'day': day.get_day_display(),
+                            'from_hour': hour.from_hour,
+                            'to_hour': hour.to_hour,
+                        }
+                return JsonResponse(response)
+            except IntegrityError:
+                response = {
+                    'status': 'Failed',
+                    'message': f'{from_hour} - {to_hour} already exists'
+                }
+                return JsonResponse(response)
+        else:
+            response = {
+                    'status': 'Failed',
+                    'message': 'Invalid request'
+                }
+            return JsonResponse(response)
+
+
+@login_required(login_url='signin')
+@user_passes_test(is_vendor)
+def remove_operating_hours(request, pk=None):
+    if request.user.is_authenticated:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            hour = get_object_or_404(OpeningHour, pk=pk)
+            hour.delete()
+            return JsonResponse({
+                'status': 'Success',
+                'id': pk,
+            })

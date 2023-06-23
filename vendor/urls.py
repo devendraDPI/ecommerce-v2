@@ -14,4 +14,7 @@ urlpatterns = [
     path('category/product/add-product/', views.add_product, name='add-product'),
     path('category/product/edit-product/<int:pk>/', views.edit_product, name='edit-product'),
     path('category/product/delete-product/<int:pk>/', views.delete_product, name='delete-product'),
+    path('operating-hours/', views.operating_hours, name='operating-hours'),
+    path('operating-hours/add/', views.add_operating_hours, name='add-operating-hours'),
+    path('operating-hours/remove/<int:pk>/', views.remove_operating_hours, name='remove-operating-hours'),
 ]

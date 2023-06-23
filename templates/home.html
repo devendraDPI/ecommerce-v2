@@ -54,6 +54,11 @@
                   </div>
                   <div class="col-md-10">
                     <a href="{% url 'vendor-details' vendor.slug %}" class="text-white" style="text-decoration: none;"><h5 class="card-title">{{ vendor.name }}</h5></a>
+                    {% if vendor.is_open %}
+                      <span class="badge bg-success-subtle border border-success-subtle text-success-emphasis rounded-pill">Open</span>
+                    {% else %}
+                      <span class="badge bg-danger-subtle border border-danger-subtle text-danger-emphasis rounded-pill">Close</span>
+                    {% endif %}
                     {% if vendor.kms %}
                       <span class="badge bg-info-subtle border border-info-subtle text-info-emphasis rounded-pill text-start"><small>{{ vendor.kms }} km away</small></span><br>
                     {% endif %}

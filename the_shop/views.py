@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from vendor.models import Vendor
-from django.db.models import Q
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
 from django.contrib.gis.db.models.functions import Distance
@@ -12,7 +11,7 @@ def home(request):
         point = GEOSGeometry('POINT(%s %s)' % (get_or_set_current_location(request)))
         vendors = Vendor.objects.filter(
             user_profile__location__distance_lte=(point, D(km=6371))
-        ).annotate(distance=Distance("user_profile__location", point)).order_by("distance")
+        ).annotate(distance=Distance('user_profile__location', point)).order_by('distance')
         for distance_ in vendors:
             distance_.kms = round(distance_.distance.km, 2)
     else:
