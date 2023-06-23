@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'product.apps.ProductConfig',
     'marketplace.apps.MarketplaceConfig',
     'django.contrib.gis',
+    'customer.apps.CustomerConfig',
 ]
 
 MIDDLEWARE = [
