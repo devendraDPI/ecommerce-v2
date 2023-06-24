@@ -48,3 +48,18 @@ class UserProfileForm(forms.ModelForm):
         super(UserProfileForm, self).__init__(*args, **kwargs)
         for field in self.fields:
             self.fields[field].widget.attrs['class'] = 'form-control my-2'
+
+
+class UserInfoForm(forms.ModelForm):
+    first_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'first name'}))
+    last_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'last name'}))
+    phone = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'phone'}))
+
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'phone']
+
+    def __init__(self, *args, **kwargs):
+        super(UserInfoForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs['class'] = 'form-control my-2'
