@@ -3,6 +3,7 @@ from account.forms import UserSignupForm
 from account.models import User, UserProfile
 from django.contrib import auth, messages
 from account.utils import detect_user, send_email, is_customer, is_vendor
+from order.models import Order
 from vendor.forms import VendorForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.http import urlsafe_base64_decode
@@ -180,7 +181,14 @@ def dashboard(request):
 @login_required(login_url='signin')
 @user_passes_test(is_customer)
 def customer_dashboard(request):
-    return render(request, 'account/customer-dashboard.html')
+    orders = Order.objects.filter(user=request.user, is_ordered=True).order_by('-created_at')
+    recent_orders = orders[:10]
+    context = {
+        'orders': orders,
+        'orders_count': orders.count(),
+        'recent_orders': recent_orders,
+    }
+    return render(request, 'account/customer-dashboard.html', context)
 
 
 @login_required(login_url='signin')
