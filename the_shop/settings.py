@@ -77,6 +77,7 @@ TEMPLATES = [
                 'account.context_processors.get_google_api',
                 'marketplace.context_processors.get_cart_count',
                 'marketplace.context_processors.get_cart_amount',
+                'account.context_processors.get_paypal_client_id',
             ],
         },
     },
@@ -180,3 +181,10 @@ if DEBUG == True:
     os.environ['PATH'] = os.path.join(BASE_DIR, 'venv\Lib\site-packages\osgeo') + ';' + os.environ['PATH']
     os.environ['PROJ_LIB'] = os.path.join(BASE_DIR, 'venv\Lib\site-packages\osgeo\data\proj') + ';' + os.environ['PATH']
     GDAL_LIBRARY_PATH = os.path.join(BASE_DIR, 'venv\Lib\site-packages\osgeo\gdal304.dll')
+
+
+# Paypal configuration
+PAYPAL_CLIENT_ID = config('PAYPAL_CLIENT_ID')
+
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
