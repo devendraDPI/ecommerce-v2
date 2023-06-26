@@ -7,11 +7,12 @@ from marketplace.models import Cart, Tax
 from order.forms import OrderForm
 from order.models import Order, OrderedProduct, Payment
 import simplejson as json
-from order.utils import generate_order_number
+from order.utils import generate_order_number, order_total_by_vendor
 from django.contrib.auth.decorators import login_required
 import razorpay
 from product.models import Product
 from the_shop.settings import RZP_KEY_ID, RZP_KEY_SECRET
+from django.contrib.sites.shortcuts import get_current_site
 
 
 client = razorpay.Client(auth=(RZP_KEY_ID, RZP_KEY_SECRET))
@@ -132,21 +133,37 @@ def payment(request):
         # Send order received email to customer
         mail_subject = 'Thankyou for your order'
         mail_template = 'order/email/order-confirmation-email.html'
+        ordered_product = OrderedProduct.objects.filter(order=order)
+        customer_subtotal = sum((item.price * item.quantity) for item in ordered_product)
+        tax_data = json.loads(order.tax_data)
         context = {
             'user': request.user,
             'order': order,
             'to_email': order.email,
+            'ordered_product': ordered_product,
+            'domain': get_current_site(request),
+            'customer_subtotal': customer_subtotal,
+            'tax_data': tax_data,
         }
         send_notification_email(mail_subject, mail_template, context)
         # Send order received email to vendor
         mail_subject = 'Received new order'
         mail_template = 'order/email/new-order-received-email.html'
-        to_eamils = list({v.product.vendor.user.email for v in cart_items})
-        context = {
-            'order': order,
-            'to_email': to_eamils,
-        }
-        send_notification_email(mail_subject, mail_template, context)
+        to_eamils = []
+        for i in cart_items:
+            if i.product.vendor.user.email not in to_eamils:
+                to_eamils.append(i.product.vendor.user.email)
+                ordered_product_to_vendor = OrderedProduct.objects.filter(order=order, product__vendor=i.product.vendor)
+                context = {
+                    'order': order,
+                    'to_email': i.product.vendor.user.email,
+                    'ordered_product_to_vendor': ordered_product_to_vendor,
+                    'domain': get_current_site(request),
+                    'vendor_subtotal': order_total_by_vendor(order, i.product.vendor.id)['subtotal'],
+                    'tax_data':  order_total_by_vendor(order, i.product.vendor.id)['tax_dict'],
+                    'vendor_total':  order_total_by_vendor(order, i.product.vendor.id)['total'],
+                }
+                send_notification_email(mail_subject, mail_template, context)
         # Clear the cart items if payment is successful
         cart_items.delete()
         # Retuen order status
