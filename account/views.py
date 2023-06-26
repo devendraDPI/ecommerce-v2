@@ -1,3 +1,4 @@
+import datetime
 from django.shortcuts import redirect, render
 from account.forms import UserSignupForm
 from account.models import User, UserProfile
@@ -9,6 +10,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from django.template.defaultfilters import slugify
+from vendor.models import Vendor
 
 
 def user_signup(request):
@@ -194,4 +196,18 @@ def customer_dashboard(request):
 @login_required(login_url='signin')
 @user_passes_test(is_vendor)
 def vendor_dashboard(request):
-    return render(request, 'account/vendor-dashboard.html')
+    vendor = Vendor.objects.get(user=request.user)
+    orders = Order.objects.filter(vendors__in=[vendor.id], is_ordered=True).order_by('-created_at')
+    recent_orders = orders[:10]
+    current_month = datetime.datetime.now().month
+    current_month_orders = orders.filter(vendors__in=[vendor.id], created_at__month=current_month)
+    current_month_revenue = sum(i.get_total_by_vendor()['total'] for i in current_month_orders)
+    total_revenue = sum(order.get_total_by_vendor()['total'] for order in orders)
+    context = {
+        'orders': orders,
+        'orders_count': orders.count(),
+        'recent_orders': recent_orders,
+        'total_revenue': total_revenue,
+        'current_month_revenue': current_month_revenue,
+    }
+    return render(request, 'account/vendor-dashboard.html', context)

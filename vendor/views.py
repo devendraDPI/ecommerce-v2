@@ -2,6 +2,7 @@ from django.db import IntegrityError
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from account.models import UserProfile
+from order.models import Order, OrderedProduct
 from product.forms import CategoryForm, ProductForm
 from product.models import Category, Product
 from vendor.forms import VendorForm, OpeningHourForm
@@ -250,3 +251,32 @@ def remove_operating_hours(request, pk=None):
                 'status': 'Success',
                 'id': pk,
             })
+
+
+@login_required(login_url='signin')
+@user_passes_test(is_vendor)
+def order_details(request, order_number):
+    try:
+        order = Order.objects.get(order_number=order_number, is_ordered=True)
+        ordered_product = OrderedProduct.objects.filter(order=order, product__vendor=get_vendor(request))
+        context = {
+            'order': order,
+            'ordered_product': ordered_product,
+            'subtotal': order.get_total_by_vendor()['subtotal'],
+            'tax_data': order.get_total_by_vendor()['tax_dict'],
+            'total': order.get_total_by_vendor()['total'],
+        }
+        return render(request, 'vendor/order-details.html', context)
+    except:
+        return redirect('vendor-dashboard')
+
+
+@login_required(login_url='signin')
+@user_passes_test(is_vendor)
+def my_orders(request):
+    vendor = Vendor.objects.get(user=request.user)
+    orders = Order.objects.filter(vendors__in=[vendor.id], is_ordered=True).order_by('-created_at')
+    context = {
+        'orders': orders,
+    }
+    return render(request, 'vendor/my-orders.html', context)

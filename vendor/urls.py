@@ -17,4 +17,6 @@ urlpatterns = [
     path('operating-hours/', views.operating_hours, name='operating-hours'),
     path('operating-hours/add/', views.add_operating_hours, name='add-operating-hours'),
     path('operating-hours/remove/<int:pk>/', views.remove_operating_hours, name='remove-operating-hours'),
+    path('order-details/<str:order_number>/', views.order_details, name='vendor-order-details'),
+    path('my-orders/', views.my_orders, name='vendor-orders'),
 ]

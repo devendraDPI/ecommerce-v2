@@ -3,13 +3,14 @@ from django.shortcuts import redirect, render
 from django.contrib import messages
 from account.utils import send_notification_email
 from marketplace.context_processors import get_cart_amount
-from marketplace.models import Cart
+from marketplace.models import Cart, Tax
 from order.forms import OrderForm
 from order.models import Order, OrderedProduct, Payment
 import simplejson as json
 from order.utils import generate_order_number
 from django.contrib.auth.decorators import login_required
 import razorpay
+from product.models import Product
 from the_shop.settings import RZP_KEY_ID, RZP_KEY_SECRET
 
 
@@ -22,6 +23,28 @@ def place_order(request):
     cart_items_count = cart_items.count()
     if cart_items_count < 1:
         return redirect('marketplace')
+    vendors_ids = list({i.product.vendor.id for i in cart_items})
+    get_tax = Tax.objects.filter(is_active=True)
+    subtotal = 0
+    k = {}
+    all_data = {}
+    for i in cart_items:
+        product = Product.objects.get(pk=i.product.id, vendor_id__in=vendors_ids)
+        vendor_id = product.vendor.id
+        if vendor_id in k:
+            subtotal = k[vendor_id]
+            subtotal += (product.price * i.quantity)
+            k[vendor_id] = subtotal
+        else:
+            subtotal = (product.price * i.quantity)
+            k[vendor_id] = subtotal
+        tax_dict = {}
+        for i in get_tax:
+            tax_type = i.tax_type
+            percentage = i.percentage
+            tax_amount = round((percentage * subtotal) / 100, 2)
+            tax_dict[tax_type] = {str(percentage): str(tax_amount)}
+        all_data[product.vendor.id] = {str(subtotal): tax_dict}
     subtotal = get_cart_amount(request)['subtotal']
     tax_data = get_cart_amount(request)['tax_dict']
     tax = get_cart_amount(request)['tax']
@@ -42,10 +65,12 @@ def place_order(request):
             order.user = request.user
             order.total = total
             order.tax_data = json.dumps(tax_data)
+            order.all_data = json.dumps(all_data)
             order.total_tax = tax
             order.payment_method = request.POST['payment_method']
             order.save()
             order.order_number = generate_order_number(order.id)
+            order.vendors.add(*vendors_ids)
             order.save()
             # Razorpay
             DATA = {

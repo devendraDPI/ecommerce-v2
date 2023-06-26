@@ -9,7 +9,8 @@ class OrderProductInline(admin.TabularInline):
 
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('order_number', 'first_name', 'last_name', 'phone', 'email',
-                    'pin_code', 'total', 'status', 'payment_method', 'is_ordered', 'created_at')
+                    'pin_code', 'total', 'status', 'order_placed_to', 'payment_method',
+                    'is_ordered', 'created_at')
     inlines = (OrderProductInline,)
 
 
