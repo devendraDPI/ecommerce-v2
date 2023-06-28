@@ -1,0 +1,78 @@
+.form-control:focus {
+  border-color: #000000 !important;
+  box-shadow: 0 0 5px rgb(122, 122, 122) !important;
+}
+
+.form-check-input:checked {
+  background-color: rgb(0, 0, 0) !important;
+  border: 0;
+}
+
+.form-check-input:focus,
+.label::after,
+label.form-check-label:focus,
+.form-check-input::after,
+.form-check-input:not(:disabled):not(.disabled):active:focus {
+  color: black;
+  outline: 0;
+  border: 0;
+  box-shadow: 0 0 0 0.1rem rgb(0, 0, 0) !important;
+}
+
+.form-check-input {
+  border: var(--bs-border-width) solid #000000;
+}
+
+.dropdown-menu>li>a:hover {
+  background-color: rgb(212, 212, 212);
+}
+
+@keyframes show-toast {
+  0% {
+    bottom: -100%
+  }
+
+  10% {
+    bottom: 100px
+  }
+
+  80% {
+    bottom: 100px
+  }
+
+  100% {
+    bottom: -100%
+  }
+}
+
+.custom-alert {
+  position: fixed;
+  bottom: 100%;
+  right: 20px;
+  animation: show-toast;
+  animation-duration: 10s;
+  z-index: 99;
+}
+
+.payment-method [type=radio] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.payment-method [type=radio]+img {
+  cursor: pointer;
+  padding: 5px;
+}
+
+.payment-method [type=radio]:checked+img {
+  outline: 2px solid rgb(0, 0, 0);
+  border-radius: 50px;
+}
+
+.dataTables_wrapper .dataTables_filter {
+  float: right;
+  text-align: right;
+  margin-bottom: 10px;
+}
