@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% block title %}Checkout{% endblock title %}
+{% load static %}
+{% block content %}
+  <div class="container-fluid">
+    <div class="container-fluid my-2">
+      <main class="container-fluid">
+        <div class="row g-5">
+          <h3 class="pb-2 mb-2 border-bottom"><b>Billing Details</b></h3>
+          <div class="col-md-6">
+            <div class="row mb-2">
+              <div class="col-md-12 mb-3">
+                <div class="row g-0 border rounded overflow-hidden flex-md-row shadow" style="height: 100%;">
+                  <div class="col p-4 d-flex flex-column position-static">
+                    <div class="container">
+                      <form action="{% url 'place-order' %}" method="POST"> {% csrf_token %}
+                        <div class="form-floating">{{ form.first_name }}<label for="id_first_name">first name</label></div>
+                        <div class="form-floating">{{ form.last_name }}<label for="id_last_name">last name</label></div>
+                        <div class="form-floating">{{ form.phone }}<label for="id_phone">phone</label></div>
+                        <div class="form-floating">{{ form.email }}<label for="id_email">email</label></div>
+                        <div class="form-floating">{{ form.address }}<label for="id_address">address</label></div>
+                        <div class="form-floating">{{ form.city }}<label for="id_city">city</label></div>
+                        <div class="form-floating">{{ form.state }}<label for="id_state">state</label></div>
+                        <div class="form-floating">{{ form.country }}<label for="id_country">country</label></div>
+                        <div class="form-floating">{{ form.pin_code }}<label for="id_pin_code">pin code</label></div> <hr>
+                        <h5 class="text-center"><b>Payment method</b></h5>
+                        <div class="payment-method text-center my-3">
+                          <label><input type="radio" name="payment_method" value="RazorPay"> <img src="{% static 'images/payment/razorpay.png' %}" alt="razorpay logo" width="80px"></label>
+                          <label><input type="radio" name="payment_method" value="PayPal"> <img src="{% static 'images/payment/paypal.png' %}" alt="paypal logo" width="70px"></label><br>
+                          <span class="text-danger" id="payment-method-error"></span>
+                        </div>
+                        <div class="container text-center"><button onclick="return payMethodConfirm();" type="submit" class="btn btn-dark rounded-pill p-2">Place order</button></div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="position-sticky rounded shadow" style="top: 2rem;">
+              <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between align-items-center bg-dark text-white" style="font-weight: 700;">Your order</li>
+                <table class="table table-hover table-borderless">
+                  {% for product in cart_items %}
+                    <tbody>
+                      <tr id="cart-item-{{ product.id }}">
+                        <td>{{ forloop.counter }}</td>
+                        <td>
+                          <div class="row">
+                            <div class="col-md-2">
+                              <img src="{{ product.product.image.url }}" width="100%" class="rounded" alt="product image">
+                            </div>
+                            <div class="col-md-10">
+                              <b>{{ product.product.name }}</b>
+                              <a href="{% url 'vendor-details' product.product.vendor.slug %}"><small class="badge bg-info-subtle border border-info-subtle text-info-emphasis rounded-pill">{{ product.product.vendor.name }}</small></a> <br>
+                              <small class="text-muted">{{ product.product.description|truncatechars:"60" }}</small>
+                            </div>
+                          </div>
+                        </td>
+                        <td><label id="quantity-{{ product.product.id }}" class="mx-1 quantity"><span>x{{ product.quantity }}</span></label></td>
+                        <td>₹{{ product.product.price|floatformat:2 }}</td>
+                      </tr>
+                    </tbody>
+                  {% endfor %}
+                </table>
+                <li class="list-group-item d-flex justify-content-between align-items-center" style="font-weight: 700;">
+                  Subtotal:
+                  <span class="badge bg-dark rounded-pill price">
+                    <span class="currency">₹</span>
+                    <span id="subtotal">{{ subtotal|floatformat:2 }}</span>
+                  </span>
+                </li>
+                {% for key, value in tax_dict.items %}
+                  {% for i, j in value.items %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center" style="font-weight: 700;">
+                      <span>{{ key }} <small style="font-size: small;">({{ i }}%)</small>:</span>
+                      <span class="badge bg-dark rounded-pill price">
+                        <span class="currency">₹</span>
+                        <span id="tax-{{ key }}">{{ j|floatformat:2 }}</span>
+                      </span>
+                    </li>
+                  {% endfor %}
+                {% endfor %}
+                <li class="list-group-item d-flex justify-content-between align-items-center" style="font-weight: 700;">
+                  Total:
+                  <span class="badge bg-dark rounded-pill price">
+                    <span class="currency">₹</span>
+                    <span id="total">{{ total|floatformat:2 }}</span>
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script>
+    function payMethodConfirm() {
+      var payMethod = $("input[name='payment_method']:checked").val()
+      if (!payMethod) {
+        $('#payment-method-error').html('Please select a payment method');
+        return false;
+      }
+      else {
+        var conf = confirm('You have selected ' + payMethod + ' as your payment method')
+        if (conf == true) {
+          return true;
+        }
+        else {
+          return false;
+        }
+      }
+    }
+    $('input[name=payment_method]').on('change', function () {
+      $('#payment-method-error').html('');
+    })
+  </script>
+{% endblock content %}

@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %}Order details{% endblock title %}
+{% load static %}
+{% block content %}
+  <div class="container-fluid">
+    {% include 'includes/customer-cover.html' %}
+    <div class="row">
+      {% include 'includes/customer-sidebar.html' %}
+      <div class="col-md-10">
+        <div class="container my-3">
+          {% include 'includes/back-button.html' %}
+          <div class="justify-content-center row">
+            <div class="col-md-10 card shadow">
+              <div class="bg-white p-4">
+                <div class="container text-center">
+                  <img src="{% static 'images/logo/logo.png' %}" alt="logo" width="100px" class="bg-dark rounded-pill"><br>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <span>Review your order</span>
+                  </div>
+                  <div class="col-md-6 text-end">
+                    <p class="mb-0">{{ order.name }}</p>
+                    <p class="mb-0">{{ order.address }}</p>
+                    <p class="mb-0">{{ order.phone }}</p>
+                    <p class="mb-0">{{ order.email }}</p>
+                  </div>
+                </div><hr>
+                <div class="d-flex justify-content-between text-center">
+                  <div><span class="d-block"><b>Order Date</b><br> {{ order.created_at }}</span></div>
+                  <div><span class="d-block"><b>Order Number</b><br> {{ order.order_number }}</span></div>
+                  <div><span class="d-block"><b>Payment Method</b><br> {{ order.payment_method }}</span></div>
+                  <div><span class="d-block"><b>Transaction ID</b><br> {{ order.payment.transaction_id }}</span></div>
+                </div><hr>
+                <table class="table table-hover table-borderless">
+                  <thead class="table-dark text-center">
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Products</th>
+                      <th scope="col">Qty</th>
+                      <th scope="col">Price</th>
+                    </tr>
+                  </thead>
+                  {% for product in ordered_product %}
+                    <tbody style="vertical-align: middle;">
+                      <tr id="cart-item-{{ product.id }}">
+                        <td>{{ forloop.counter }}</td>
+                        <td>
+                          <div class="row">
+                            <div class="col-md-2 text-center">
+                              <img src="{{ product.product.image.url }}" width="50%" class="rounded" alt="product image">
+                            </div>
+                            <div class="col-md-10">
+                              <b>{{ product.product.name }}</b>
+                              <a href="{% url 'vendor-details' product.product.vendor.slug %}"><small class="badge bg-info-subtle border border-info-subtle text-info-emphasis rounded-pill">{{ product.product.vendor.name }}</small></a> <br>
+                              <small class="text-muted">{{ product.product.description|truncatechars:"60" }}</small>
+                            </div>
+                          </div>
+                        </td>
+                        <td><label id="quantity-{{ product.product.id }}" class="mx-1 quantity"><span>x{{ product.quantity }}</span></label></td>
+                        <td>₹{{ product.product.price }}</td>
+                      </tr>
+                    </tbody>
+                  {% endfor %}
+                </table>
+                <div>
+                  <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center bg-dark text-white" style="font-weight: 700;">Your order</li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center" style="font-weight: 700;">
+                      Subtotal:
+                      <span class="badge bg-dark rounded-pill price">
+                        <span class="currency">₹</span>
+                        <span id="subtotal">{{ subtotal|floatformat:2 }}</span>
+                      </span>
+                    </li>
+                    {% for key, value in tax_data.items %}
+                      {% for i, j in value.items %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center" style="font-weight: 700;">
+                          <span>{{ key }} <small style="font-size: small;">({{ i }}%)</small>:</span>
+                          <span class="badge bg-dark rounded-pill price">
+                            <span class="currency">₹</span>
+                            <span id="tax-{{ key }}">{{ j|floatformat:2 }}</span>
+                          </span>
+                        </li>
+                      {% endfor %}
+                    {% endfor %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center" style="font-weight: 700;">
+                      Total:
+                      <span class="badge bg-dark rounded-pill price">
+                        <span class="currency">₹</span>
+                        <span id="total">{{ order.total|floatformat:2 }}</span>
+                      </span>
+                    </li>
+                  </ul>
+                </div><hr>
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <span class="d-block"><b>Thanks</b></span>
+                    <span class="d-block">The Shop Team</span>
+                  </div>
+                  <div class="d-flex justify-content-end align-items-end">
+                    <span class="d-block"><b>Need help? </b></span>
+                    <span class="d-block">Contact: +91 987 654 3210</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

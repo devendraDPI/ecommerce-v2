@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Add product{% endblock title %}
+{% load static %}
+{% block content %}
+  <div class="container-fluid">
+    {% include 'includes/vendor-cover.html' %}
+    <div class="row">
+      {% include 'includes/vendor-sidebar.html' %}
+      <div class="col-md-10">
+        <div class="container my-3">
+          {% include 'includes/back-button.html' %}
+          <h2 class="fw-normal"><b>Add product</b></h2><hr>
+          <form action="{% url 'add-product' %}" class="container col-md-8" method="POST" enctype="multipart/form-data"> {% csrf_token %}
+            <div class="container text-center">
+              <div class="form-floating">{{ form.image }}</div>
+              {% for error in form.image.errors %}
+                <span class="badge bg-danger-subtle border border-danger-subtle text-danger-emphasis rounded-pill" style="list-style-type: none;" class="text-danger">{{ error }}</span>
+              {% endfor %}
+            </div><hr>
+            <div class="form-floating">{{ form.category }}<label for="id_category">category<span class="text-danger">*</span></label></div>
+            <div class="form-floating">{{ form.name }}<label for="id_name">product name<span class="text-danger">*</span></label></div>
+            <div class="form-floating">{{ form.description }}<label for="id_description">description</label></div>
+            <div class="form-floating">{{ form.price }}<label for="id_price">price<span class="text-danger">*</span></label></div>
+            <label for="id_is_available" class="my-2">{{ form.is_available }} is available?<span class="text-danger">*</span></label>
+            <div class="text-center my-5"><button class="btn btn-dark rounded-pill" type="submit"><i class="bi bi-check-circle"></i> Create</div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

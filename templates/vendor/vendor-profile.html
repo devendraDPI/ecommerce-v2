@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Shop profile{% endblock title %}
+{% block content %}
+  <div class="container-fluid">
+    {% include 'includes/vendor-cover.html' %}
+    <div class="row">
+      {% include 'includes/vendor-sidebar.html' %}
+      <div class="col-md-10">
+        <div class="container my-3">
+          <h2 class="fw-normal"><b>Manage your profile</b></h2><hr>
+          <form autocomplete="on" class="container col-md-8" method="POST" action="{% url 'vendor-profile' %}" enctype="multipart/form-data"> {% csrf_token %}
+            <div class="container text-center">
+              <img src="{{ profile.profile_image.url }}" alt="profile image" width="30%" class="rounded-pill"><br>
+              <small style="font-size: 12px;">Profile image<span class="text-danger">*</span></small>
+              <div class="form-floating">{{ profile_form.profile_image }}</div>
+              {% for error in profile_form.profile_image.errors %}
+                <span class="badge bg-danger-subtle border border-danger-subtle text-danger-emphasis rounded-pill" style="list-style-type: none;" class="text-danger">{{ error }}</span>
+              {% endfor %}
+            </div><hr>
+            <div class="container text-center">
+              <img src="{{ profile.cover_image.url }}" alt="cover image" width="80%" class="rounded"><br>
+              <small style="font-size: 12px;">Cover image<span class="text-danger">*</span></small>
+              <div class="form-floating">{{ profile_form.cover_image }}</div>
+              {% for error in profile_form.cover_image.errors %}
+                <span class="badge bg-danger-subtle border border-danger-subtle text-danger-emphasis rounded-pill" style="list-style-type: none;" class="text-danger">{{ error }}</span>
+              {% endfor %}
+            </div><hr>
+            <div class="container text-center">
+              <img src="{{ vendor.license.url }}" alt="license" width="60%" class="rounded"><br>
+              <small style="font-size: 12px;">License<span class="text-danger">*</span></small>
+              <div class="form-floating">{{ vendor_form.license }}</div>
+              {% for error in vendor_form.license.errors %}
+                <span class="badge bg-danger-subtle border border-danger-subtle text-danger-emphasis rounded-pill" style="list-style-type: none;" class="text-danger">{{ error }}</span>
+              {% endfor %}
+            </div><hr>
+            <div class="form-floating">{{ vendor_form.name }}<label for="id_name">vendor name<span class="text-danger">*</span></label></div>
+            <div class="form-floating">{{ profile_form.address }}<label for="id_address">address<span class="text-danger">*</span></label></div>
+            <div class="form-floating">{{ profile_form.city }}<label for="id_city">city<span class="text-danger">*</span></label></div>
+            <div class="form-floating">{{ profile_form.state }}<label for="id_state">state<span class="text-danger">*</span></label></div>
+            <div class="form-floating">{{ profile_form.country }}<label for="id_country">country<span class="text-danger">*</span></label></div>
+            <div class="form-floating">{{ profile_form.pin_code }}<label for="id_pin_code">pin code<span class="text-danger">*</span></label></div>
+            <div class="form-floating">{{ profile_form.latitude }}<label for="id_latitude">latitude</label></div>
+            <div class="form-floating">{{ profile_form.longitude }}<label for="id_longitude">longitude</label></div>
+            <div class="text-center my-5"><input class="btn btn-dark rounded-pill" type="submit" value="Update"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

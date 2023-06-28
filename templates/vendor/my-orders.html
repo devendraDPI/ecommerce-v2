@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Orders{% endblock title %}
+{% block content %}
+  <div class="container-fluid">
+    {% include 'includes/vendor-cover.html' %}
+    <div class="row">
+      {% include 'includes/vendor-sidebar.html' %}
+      <div class="col-md-10">
+        <div class="container my-3">
+          <h2 class="my-3 fw-normal"><b>Orders</b></h2><hr>
+          <div class="container my-4">
+            <table class="table table-hover table-borderless" id="myTable" style="vertical-align: middle;">
+              <thead class="table-dark text-center">
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Order Number</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Total</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for order in orders %}
+                  <tr>
+                    <th>{{ forloop.counter }}</th>
+                    <th><a href="{% url 'vendor-order-details' order.order_number %}" style="color: unset; text-decoration: none;">{{ order.order_number }}</a></th>
+                    <td>{{ order.name }}</td>
+                    <td>₹{{ order.get_total_by_vendor.total|floatformat:2 }}</td>
+                    <td>{{ order.status }}</td>
+                    <td>{{ order.created_at }}</td>
+                    <td><a href="{% url 'vendor-order-details' order.order_number %}" class="btn btn-sm btn-dark rounded-pill">Details</a></td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

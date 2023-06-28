@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}Products by category{% endblock title %}
+{% load static %}
+{% block content %}
+  <div class="container-fluid">
+    {% include 'includes/vendor-cover.html' %}
+    <div class="row">
+      {% include 'includes/vendor-sidebar.html' %}
+      <div class="col-md-10">
+        <div class="container my-3">
+          <h2 class="fw-normal"><b>Manage your products</b></h2><hr>
+          {% include 'includes/back-button.html' %}
+          <h4><b>Category: <span>{{ category }}</span></b></h4>
+          {% if products %}
+            <div class="float-end">
+              <a href="{% url 'add-product' %}" class="btn btn-outline-dark rounded-pill m-2" style="border-style: none;"><i class="bi bi-plus-circle"></i> Add product</a>
+            </div>
+            <table class="table table-hover table-borderless">
+              <thead class="table-dark text-center">
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Products</th>
+                  <th scope="col">Availability</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody style="vertical-align: middle;">
+                {% for product in products %}
+                  <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>
+                      <a href="{% url 'edit-product' product.id %}" class="text-dark" style="text-decoration: none;">
+                        <div class="row">
+                          <div class="col-md-1">
+                            <img src="{{ product.image.url }}" width="100%" class="rounded" alt="product image">
+                          </div>
+                          <div class="col-md-11">
+                            <b>{{ product.name }}</b><br>
+                            <small class="text-muted">{{ product.description|truncatechars:"250" }}</small>
+                          </div>
+                        </div>
+                      </a>
+                    </td>
+                    <td class="text-center">
+                      {% if product.is_available %}
+                        <span class="badge bg-success-subtle border border-success-subtle text-success-emphasis rounded-pill">Available</span>
+                      {% else %}
+                        <span class="badge bg-danger-subtle border border-danger-subtle text-danger-emphasis rounded-pill">Not available</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <a href="{% url 'edit-product' product.id %}" style="color: unset;"><i class="bi bi-pencil-square"></i></a>
+                      <a href="{% url 'delete-product' product.id %}" style="color: unset;" onclick="return confirm('Are you sure you want to delete?')"><i class="bi bi-trash text-danger"></i></a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+          <div class="text-center">
+            <h5 class="text-center">No products found</h5>
+            <a href="{% url 'add-product' %}" class="btn btn-outline-dark rounded-pill m-2" style="border-style: none;"><i class="bi bi-plus-circle"></i> Add product</a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% block title %}Products by vendor{% endblock title %}
+{% load static %}
+{% block content %}
+  <div class="container-fluid">
+    <div class="container-fluid my-2">
+      <main class="container-fluid">
+        <!-- START vendor cover image -->
+          <div class="carousel slide">
+            <div class="carousel-inner">
+              <div class="carousel-item active">
+                <img src="{{ vendor.user_profile.cover_image.url }}" class="d-block rounded" height="350px" width="100%" style="filter: brightness(60%);" alt="vendor cover image">
+                <div class="carousel-caption d-none d-md-block">
+                  <img src="{{ vendor.user_profile.profile_image.url }}" class="rounded-pill mb-3" width="10%" alt="vendor profile image">
+                  <h5>{{ vendor.name }}</h5>
+                  {% if vendor.is_open %}
+                    <span class="badge bg-success-subtle border border-success-subtle text-success-emphasis rounded-pill">Open</span>
+                  {% else %}
+                    <span class="badge bg-danger-subtle border border-danger-subtle text-danger-emphasis rounded-pill">Close</span>
+                  {% endif %}
+                  {% if vendor.user_profile.address %}<p><i class="bi bi-geo-alt"></i> {{ vendor.user_profile.address }}</p>{% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        <!-- END vendor cover image -->
+        <h3 class="pb-2 mb-2 border-bottom"><b>Products by {{ vendor.name }}</b></h3>
+        <div class="row g-5">
+          <div class="col-md-3">
+            <div class="position-sticky" style="top: 2rem;">
+              <div class="list-group">
+                <span href="#" class="list-group-item list-group-item-light bg-dark text-white"><b>Categor{{ categories.count|pluralize:"y,ies" }} </b><small>({{ categories.count }})</small></span>
+                {% for category in categories %}
+                  <a href="#{{ category.name }}" class="list-group-item list-group-item-action list-group-item-light">{{ category }}</a>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+          <div class="col-md-9">
+            {% if operating_hours %}
+              <div class="dropdown-center text-center">
+                <button class="btn btn-sm btn-dark dropdown-toggle rounded-pill px-4" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <div class="row" style="align-items: center;">
+                    <div class="col"><b>Today</b></div>
+                    <div class="col">
+                      {% for today in today_operating_hours %}
+                        {% if today.is_closed %}
+                          <b class="text-danger">Closed</b>
+                        {% else %}
+                          {{ today.from_hour }} - {{ today.to_hour }}<br>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  </div>
+                </button>
+                <ul class="dropdown-menu">
+                  {% for hour in operating_hours %}
+                    <li>
+                      <a class="dropdown-item" href="#">
+                        <div class="row">
+                          <div class="col"><b>{{ hour }}</b></div>
+                          <div class="col">{% if hour.is_closed %}<b class="text-danger">Closed</b>{% else %}{{ hour.from_hour }} - {{ hour.to_hour }}{% endif %}</div>
+                        </div>
+                      </a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+            <div class="row mb-2">
+              {% for category in categories %}
+                <div class="col-md-12 my-3">
+                  <div class="row g-0 border rounded overflow-hidden flex-md-row m-2 shadow" style="height: 100%;">
+                    <div class="col p-4 d-flex flex-column position-static">
+                      <h4 class="mb-2 text-dark-emphasis" id="{{ category.name }}"><b>{{ category.name }}</b></h4>
+                      <p class="mb-auto">{{ category.description }}</p>
+                      <div class="container">
+                        <table class="table table-hover table-borderless">
+                          <thead class="table-dark text-center">
+                            <tr>
+                              <th scope="col">#</th>
+                              <th scope="col">Products</th>
+                              <th scope="col">Availability</th>
+                              <th scope="col">Price</th>
+                              <th scope="col">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for product in category.product.all %}
+                              <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>
+                                  <a href="" class="text-dark" style="text-decoration: none;">
+                                    <div class="row">
+                                      <div class="col-md-2">
+                                        <img src="{{ product.image.url }}" width="100%" class="rounded" alt="product image">
+                                      </div>
+                                      <div class="col-md-10">
+                                        <b>{{ product.name }}</b><br>
+                                        <small class="text-muted">{{ product.description }}</small>
+                                      </div>
+                                    </div>
+                                  </a>
+                                </td>
+                                <td class="text-center">
+                                  {% if product.is_available %}
+                                    <span class="badge bg-success-subtle border border-success-subtle text-success-emphasis rounded-pill">Available</span>
+                                  {% else %}
+                                    <span class="badge bg-danger-subtle border border-danger-subtle text-danger-emphasis rounded-pill">Not available</span>
+                                  {% endif %}
+                                </td>
+                                <td>₹{{ product.price }}</td>
+                                <td>
+                                  <div class="container bg-dark text-white rounded-pill text-center" style="margin-right: 40px;">
+                                    <a href="" style="color: unset;" class="decrement-cart-item" data-id="{{ product.id }}" data-url="{% url 'decrement-cart-item' product.id %}"><i class="bi bi-cart-dash float-start"></i></a>
+                                    <label id="quantity-{{ product.id }}" class="mx-1">0</label>
+                                    <a href="" style="color: unset;" class="increment-cart-item" data-id="{{ product.id }}" data-url="{% url 'increment-cart-item' product.id %}"><i class="bi bi-cart-plus float-end"></i></a>
+                                  </div>
+                                </td>
+                              </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        {% for item in cart_item %}
+          <span id="quantity-{{ item.product.id }}" data-quantity="{{ item.quantity }}" class="item-quantity d-none">{{ item.quantity }}</span>
+        {% endfor %}
+      </main>
+    </div>
+  </div>
+{% endblock content %}

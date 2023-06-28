@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Signup{% endblock title %}
+{% block content %}
+  <div class="card shadow container col-md-5 my-5 p-5">
+    <form autocomplete="on" method="POST" action="{% url 'user-signup' %}"> {% csrf_token %}
+      <h1 class="h3 mb-3 fw-normal text-center"><b>Signup</b></h1><hr>
+      <div class="form-floating">{{ form.username }}<label for="id_username">username<span class="text-danger">*</span></label></div>
+      <div class="form-floating">{{ form.first_name }}<label for="id_first_name">first name<span class="text-danger">*</span></label></div>
+      <div class="form-floating">{{ form.last_name }}<label for="id_last_name">last name<span class="text-danger">*</span></label></div>
+      <div class="form-floating">{{ form.email }}<label for="id_email">email<span class="text-danger">*</span></label></div>
+      <div class="form-floating">{{ form.password }}<label for="id_password">password<span class="text-danger">*</span></label></div>
+      <div class="form-floating">{{ form.password2 }}<label for="id_password2">confirm password<span class="text-danger">*</span></label></div>
+      {% include 'includes/form-errors.html' %}
+      <div class="text-center my-5"><input class="btn btn-dark rounded-pill" type="submit" value="Signup"></div>
+    </form>
+  </div>
+{% endblock content %}

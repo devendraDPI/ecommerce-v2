@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Operating hours{% endblock title %}
+{% block content %}
+  <div class="container-fluid">
+    {% include 'includes/vendor-cover.html' %}
+    <div class="row">
+      {% include 'includes/vendor-sidebar.html' %}
+      <div class="col-md-10">
+        <div class="container my-3">
+          <h2 class="fw-normal"><b>Manage your operating hours</b></h2><hr>
+          <div class="container" style="width: 90%;">
+            <table class="table table-hover table-borderless">
+              <thead class="table-dark text-center">
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Day</th>
+                  <th scope="col">Operating hours</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody class="text-center operating-hours">
+                <form action="" id="operating-hours" method="POST"> {% csrf_token %}
+                  <tr style="vertical-align: middle;">
+                    <td scope="col">#</td>
+                    <td scope="col">{{ form.day }}</td>
+                    <td scope="col">
+                      <div class="container" style="width: 50%">
+                        <div class="row">
+                          <div class="col">{{ form.from_hour }}</div>
+                          <div class="col">{{ form.to_hour }}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td scope="col">
+                      <span title="check to set close">{{ form.is_closed }}</span>
+                      <input type="hidden" value={% url 'add-operating-hours' %} id="add-hour-url">
+                      <button title="Add" class="btn btn-sm rounded-pill add-hour" style="border-style: none;"><i class="bi bi-clipboard2-plus"></i></button>
+                    </td>
+                  </tr>
+                </form>
+                {% for hour in operating_hours %}
+                  <tr id="hour-{{ hour.id }}">
+                    <td>{{ forloop.counter }}</td>
+                    <td><b>{{ hour }}</b></td>  
+                    <td>{% if hour.is_closed %}<b class="text-danger">Closed</b>{% else %}{{ hour.from_hour }} - {{ hour.to_hour }}{% endif %}</td>
+                    <td><a href="" class="remove-hour" data-url="{% url 'remove-operating-hours' hour.id %}" style="color: unset;"><i class="bi bi-trash text-danger"></i></a></td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

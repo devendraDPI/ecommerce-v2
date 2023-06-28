@@ -1,0 +1,15 @@
+<!-- START vendor cover image -->
+  <div class="carousel slide">
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <img src="{{ vendor.user_profile.cover_image.url }}" class="d-block rounded" height="350px" width="100%" style="filter: brightness(60%);" alt="vendor cover image">
+        <div class="carousel-caption d-none d-md-block">
+          <img src="{{ vendor.user_profile.profile_image.url }}" class="rounded-pill mb-3" width="10%" alt="vendor profile image">
+          <h6>{{ vendor.name }}</h6>
+          <h6>{{ user.email }}</h6>
+          {% if vendor.user_profile.address %}<p><i class="bi bi-geo-alt"></i> {{ vendor.user_profile.address }}</p>{% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- END vendor cover image -->

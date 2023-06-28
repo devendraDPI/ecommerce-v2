@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% block title %}Cart{% endblock title %}
+{% block content %}
+  <div class="container-fluid">
+    <div class="container-fluid my-2">
+      <main class="container-fluid">
+        <div class="row g-5">
+          <h3 class="pb-2 mb-2 border-bottom"><b>Cart</b></h3>
+          <div class="col-md-8">
+            <div class="row mb-2">
+              <div class="col-md-12 mb-3">
+                <div class="row g-0 border rounded overflow-hidden flex-md-row shadow" style="height: 100%;">
+                  <div class="col p-4 d-flex flex-column position-static">
+                    <div class="container">
+                      {% if cart_items %}
+                        <table class="table table-hover table-borderless">
+                          <thead class="table-dark text-center">
+                            <tr>
+                              <th scope="col">#</th>
+                              <th scope="col">Products</th>
+                              <th scope="col">Availability</th>
+                              <th scope="col">Price</th>
+                              <th scope="col">Action</th>
+                            </tr>
+                          </thead>
+                          {% for product in cart_items %}
+                            <tbody>
+                              <tr id="cart-item-{{ product.id }}">
+                                <td>{{ forloop.counter }}</td>
+                                <td>
+                                  <div class="row">
+                                    <div class="col-md-2">
+                                      <img src="{{ product.product.image.url }}" width="100%" class="rounded" alt="product image">
+                                    </div>
+                                    <div class="col-md-10">
+                                      <b>{{ product.product.name }}</b>
+                                      <a href="{% url 'vendor-details' product.product.vendor.slug %}"><small class="badge bg-info-subtle border border-info-subtle text-info-emphasis rounded-pill">{{ product.product.vendor.name }}</small></a> <br>
+                                      <small class="text-muted">{{ product.product.description|truncatechars:"60" }}</small>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td class="text-center">
+                                  {% if product.product.is_available %}
+                                    <span class="badge bg-success-subtle border border-success-subtle text-success-emphasis rounded-pill">Available</span>
+                                  {% else %}
+                                    <span class="badge bg-danger-subtle border border-danger-subtle text-danger-emphasis rounded-pill">Not available</span>
+                                  {% endif %}
+                                </td>
+                                <td>₹{{ product.product.price }}</td>
+                                <td>
+                                  <div class="container bg-dark text-white rounded-pill text-center" style="margin-right: 40px;">
+                                    <a href="" style="color: unset;" class="decrement-cart-item" id="{{ product.id }}" data-id="{{ product.product.id }}" data-url="{% url 'decrement-cart-item' product.product.id %}"><i class="bi bi-cart-dash float-start"></i></a>
+                                    <label id="quantity-{{ product.product.id }}" class="mx-1">0</label>
+                                    <div class="float-end">
+                                      <a href="" style="color: unset;" class="increment-cart-item" data-id="{{ product.product.id }}" data-url="{% url 'increment-cart-item' product.product.id %}"><i class="bi bi-cart-plus"></i></a>
+                                      <a href="" style="color: unset;" class="delete-cart-item" data-id="{{ product.id }}" data-url="{% url 'delete-cart-item' product.id %}"><i class="bi bi-trash text-danger ms-2"></i></a>
+                                    </div>
+                                  </div>
+                                </td>
+                              </tr>
+                            </tbody>
+                          {% endfor %}
+                        </table>
+                      {% else %}
+                        <div class="text-center p-5">
+                          <h2>Cart is empty</h2>
+                          <a href="{% url 'marketplace' %}" class="btn btn-dark rounded-pill">Shop now</a>
+                        </div>
+                      {% endif %}
+                      <div class="text-center p-5" id="empty-cart" style="display: none;">
+                        <h2>Cart is empty</h2>
+                        <a href="{% url 'marketplace' %}" class="btn btn-dark rounded-pill">Shop now</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="position-sticky rounded shadow" style="top: 2rem;">
+              <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between align-items-center bg-dark text-white" style="font-weight: 700;">Your order</li>
+                <li class="list-group-item d-flex justify-content-between align-items-center" style="font-weight: 700;">
+                  Subtotal:
+                  <span class="badge bg-dark rounded-pill price">
+                    <span class="currency">₹</span>
+                    <span id="subtotal">{{ subtotal|floatformat:2 }}</span>
+                  </span>
+                </li>
+                {% for key, value in tax_dict.items %}
+                  {% for i, j in value.items %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center" style="font-weight: 700;">
+                      <span>{{ key }} <small style="font-size: small;">({{ i }}%)</small>:</span>
+                      <span class="badge bg-dark rounded-pill price">
+                        <span class="currency">₹</span>
+                        <span id="tax-{{ key }}">{{ j|floatformat:2 }}</span>
+                      </span>
+                    </li>
+                  {% endfor %}
+                {% endfor %}
+                <li class="list-group-item d-flex justify-content-between align-items-center" style="font-weight: 700;">
+                  Total:
+                  <span class="badge bg-dark rounded-pill price">
+                    <span class="currency">₹</span>
+                    <span id="total">{{ total|floatformat:2 }}</span>
+                  </span>
+                </li>
+                <a href="{% url 'checkout' %}" class="btn btn-dark p-2">Checkout</a>
+              </ul>
+            </div>
+          </div>
+        </div>
+        {% for item in cart_items %}
+          <span id="quantity-{{ item.product.id }}" data-quantity="{{ item.quantity }}" class="item-quantity d-none">{{ item.quantity }}</span>
+        {% endfor %}
+      </main>
+    </div>
+  </div>
+{% endblock content %}

@@ -1,0 +1,90 @@
+{% load static %}
+<!-- START nav -->
+  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid ms-4 me-5">
+      {% comment %} <a class="navbar-brand" href="/"><b>The Shop </b> <i class="bi bi-shop"></i></a> {% endcomment %}
+      <a href="/"><img src="{% static 'images/logo/logo.png' %}" alt="logo" class="img-fluid bg-dark rounded-pill" width="35px;"></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <!-- START current location -->
+          <nav class="navbar bg-body-tertiary">
+            <form class="container" action="">
+              <div class="input-group">
+                <input type="hidden" value="" name="location" id="location" class="form-control" placeholder="current location" autocomplete="off">
+                <span title="current location" class="btn btn-dark radius-location rounded-pill" id="radius-location" onclick="getLocation()"><i class="bi bi-geo"></i></span>
+              </div>
+            </form>
+          </nav>
+        <!-- END current location -->
+        <!-- START search -->
+          <nav class="navbar bg-body-tertiary" style="width: 100%;">
+            <form class="container-fluid" action="{% url 'search' %}" method="GET">
+              <div class="input-group">
+                <input type="text" name="q" class="form-control" placeholder="search" required>
+                <button class="btn btn-dark" id=""><i class="bi bi-search"></i></button>
+              </div>
+            </form>
+          </nav>
+        <!-- END search -->
+        <div class="container-fluid">
+          <a href="{% url 'marketplace' %}" class="btn btn-outline-dark rounded-pill" style="border-style: none;"><i class="bi bi-shop-window"></i> Marketplace</a>
+          {% if user.is_authenticated %}
+            <a href="{% url 'cart' %}" class="btn btn-outline-dark rounded-pill float-end" style="border-style: none;"><i class="bi bi-cart4"></i><span class="badge bg-light-subtle text-light-emphasis rounded-pill" id="cart-count" style="position: relative; right: 0px; top: -9px;">{{ cart_count }}</span></a>
+          {% endif %}
+        </div>
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle me-5" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Account</a>
+            <ul class="dropdown-menu">
+              {% if user.is_authenticated %}
+                <li><a class="dropdown-item" href="{% url 'dashboard' %}"><i class="bi bi-grid"></i> Dashboard</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'signout' %}"><i class="bi bi-box-arrow-in-right"></i> Signout</a></li>
+              {% else %}
+                <li><a class="dropdown-item" href="{% url 'signin' %}"><i class="bi bi-box-arrow-in-left"></i> Signin</a></li>
+                <li><a class="dropdown-item" href="{% url 'user-signup' %}"><i class="bi bi-person-circle"></i> Signup</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'vendor-signup' %}"><i class="bi bi-shop-window"></i> Register vendor</a></li>
+              {% endif %}
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+<!-- END nav -->
+<!-- START current geolocation js -->
+  <script>
+    var x = document.getElementById("location");
+    var current_location = sessionStorage.getItem("current_location")
+    if (current_location != "") {
+      x.value = current_location;
+    }
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+      }
+      else {
+        x.innerHTML = "Geolocation is not supported by this browser.";
+      }
+    }
+    function showPosition(position) {
+      var lat = position.coords.latitude;
+      var lng = position.coords.longitude;
+      var GOOGLE_API_KEY = "{{ GOOGLE_API_KEY }}"
+      var url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lng + "+&key=" + GOOGLE_API_KEY;
+      $.ajax({
+        url: url,
+        type: "GET",
+        success: function (response) {
+          var current_location = response.results[0].formatted_address
+          x.value = current_location
+          sessionStorage.setItem("current_location", current_location)
+          window.location = '?lat=' + lat + '&lng=' + lng
+        }
+      })
+    }
+  </script>
+<!-- END current geolocation js -->

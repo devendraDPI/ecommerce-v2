@@ -1,0 +1,38 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="{% static 'images/logo/logo.png' %}" rel="icon" />
+    <title>{% block title %}{% endblock title %}</title>
+    <!-- START css -->
+      <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+      <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+      <link rel="stylesheet" href="{% static 'font/bootstrap-icons.css' %}">
+      <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+    <!-- END css -->
+    <!-- START js -->
+      <script src="{% static 'js/jquery.min.js' %}"></script>
+      <script src="https://www.paypal.com/sdk/js?client-id={{ PAYPAL_CLIENT_ID }}&currency=USD"></script>
+      <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+      <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+      <script>
+        $(document).ready( function () {
+          $('#myTable').DataTable();
+        });
+      </script>
+      {% if '/' == request.path or '/vendor-profile/' in request.path %}
+        <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&libraries=places&callback=initAutoComplete" defer></script>
+      {% endif %}
+      <script src="{% static 'js/sweetalert2@11.js' %}"></script>
+      <script src="{% static 'js/custom.js' %}"></script>
+    <!-- END js -->
+  </head>
+  <body>
+    {% include 'includes/nav.html' %}
+    {% block content %}{% endblock content %}
+    {% include 'includes/alert-messages.html' %}
+    {% include 'includes/footer.html' %}
+  </body>
+</html>

@@ -1,0 +1,15 @@
+<!-- START customer cover image -->
+  <div class="carousel slide">
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <img src="{{ user_profile.cover_image.url }}" class="d-block rounded" height="350px" width="100%" style="filter: brightness(60%);" alt="customer cover image">
+        <div class="carousel-caption d-none d-md-block">
+          <img src="{{ user_profile.profile_image.url }}" class="rounded-pill mb-3" width="10%" alt="customer profile image">
+          <h5>{{ user.first_name }} {{ user.last_name }}</h5>
+          <h6><i class="bi bi-telephone"></i> {{ user.phone }}</h6>
+          <h6><i class="bi bi-mailbox"></i> {{ user.email }}</h6>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- END customer cover image -->

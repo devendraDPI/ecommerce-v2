@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+{% block title %}Review your billing details{% endblock title %}
+{% load static %}
+{% block content %}
+  <div class="container-fluid">
+    <div class="container-fluid my-2">
+      <main class="container-fluid">
+        <div class="row g-5">
+          <h3 class="pb-2 mb-2 border-bottom"><b>Review your billing details</b></h3>
+          <div class="col-md-8">
+            <div class="row mb-2">
+              <div class="col-md-12 mb-3">
+                <div class="row g-0 border rounded overflow-hidden flex-md-row shadow" style="height: 100%;">
+                  <div class="col p-4 d-flex flex-column position-static">
+                    <div class="container">
+                      <div class="billing-address">
+                        <div><b>{{ order.name }}</b></div>
+                        <div>{{ order.address }}</div>
+                        <div>{{ order.city }} - {{ order.pin_code }}</div>
+                        <div>{{ order.state }}, {{ order.country }}</div>
+                        <div><b>{{ order.phone }}</b></div>
+                        <div><b>{{ order.email }}</b></div>
+                        <div><b>{{ order.payment_method }}</b></div>
+                        <div><a href="{% url 'checkout' %}" class="btn btn-outline-dark rounded-pill my-2">Edit</a></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="position-sticky rounded shadow" style="top: 2rem;">
+              <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between align-items-center bg-dark text-white" style="font-weight: 700;">Your order</li>
+                <table class="table table-hover table-borderless">
+                  {% for product in cart_items %}
+                    <tbody>
+                      <tr id="cart-item-{{ product.id }}">
+                        <td>{{ forloop.counter }}</td>
+                        <td>
+                          <div class="row">
+                            <div class="col-md-2">
+                              <img src="{{ product.product.image.url }}" width="100%" class="rounded" alt="product image">
+                            </div>
+                            <div class="col-md-10">
+                              <b>{{ product.product.name }}</b>
+                              <a href="{% url 'vendor-details' product.product.vendor.slug %}"><small class="badge bg-info-subtle border border-info-subtle text-info-emphasis rounded-pill">{{ product.product.vendor.name }}</small></a> <br>
+                              <small class="text-muted">{{ product.product.description|truncatechars:"60" }}</small>
+                            </div>
+                          </div>
+                        </td>
+                        <td><label id="quantity-{{ product.product.id }}" class="mx-1 quantity"><span>x{{ product.quantity }}</span></label></td>
+                        <td>₹{{ product.product.price|floatformat:2 }}</td>
+                      </tr>
+                    </tbody>
+                  {% endfor %}
+                </table>
+                <li class="list-group-item d-flex justify-content-between align-items-center" style="font-weight: 700;">
+                  Subtotal:
+                  <span class="badge bg-dark rounded-pill price">
+                    <span class="currency">₹</span>
+                    <span id="subtotal">{{ subtotal|floatformat:2 }}</span>
+                  </span>
+                </li>
+                {% for key, value in tax_dict.items %}
+                  {% for i, j in value.items %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center" style="font-weight: 700;">
+                      <span>{{ key }} <small style="font-size: small;">({{ i }}%)</small>:</span>
+                      <span class="badge bg-dark rounded-pill price">
+                        <span class="currency">₹</span>
+                        <span id="tax-{{ key }}">{{ j|floatformat:2 }}</span>
+                      </span>
+                    </li>
+                  {% endfor %}
+                {% endfor %}
+                <li class="list-group-item d-flex justify-content-between align-items-center" style="font-weight: 700;">
+                  Total:
+                  <span class="badge bg-dark rounded-pill price">
+                    <span class="currency">₹</span>
+                    <span id="total">{{ total|floatformat:2 }}</span>
+                  </span>
+                </li>
+                {% if order.payment_method == 'PayPal' %}
+                  <div id="paypal-button-container"></div>
+                {% elif order.payment_method == 'RazorPay' %}
+                  <div id="razorpay-button-container">
+                    <button class="btn btn-dark rounded p-2 w-100" id="rzp-button1">RazorPay</button>
+                    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+                  </div>
+                {% endif %}
+              </ul>
+            </div>
+          </div>
+        </div>
+        {% for item in cart_items %}
+          <span id="quantity-{{ item.product.id }}" data-quantity="{{ item.quantity }}" class="item-quantity d-none">{{ item.quantity }}</span>
+        {% endfor %}
+      </main>
+    </div>
+  </div>
+  <script>
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          // Does this cookie string begin with the name we want?
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+    var total = '{{ total }}'
+    var url = '{% url "payment" %}'
+    var order_number = '{{ order.order_number }}'
+    const csrftoken = getCookie('csrftoken');
+    var order_complete = '{% url "order-complete" %}'
+    // Render the PayPal button into #paypal-button-container
+    paypal.Buttons({
+      // Set up the transaction
+      createOrder: function (data, actions) {
+        return actions.order.create({
+          style: {
+            color: 'black',
+            shape: 'pill',
+            label: 'pay',
+            height: 40,
+          },
+          purchase_units: [{
+            amount: {
+              value: total
+            }
+          }]
+        });
+      },
+      // Finalize the transaction
+      onApprove: function (data, actions) {
+        return actions.order.capture().then(function (orderData) {
+          // Successful capture For demo purposes:
+          // console.log(orderData);
+          var transaction = orderData.purchase_units[0].payments.captures[0];
+          var transaction_id = transaction.id
+          var status = orderData.status
+          var payment_method = 'paypal'
+          sendTransaction(transaction_id, payment_method, status);
+          const element = document.getElementById('paypal-button-container');
+          element.innerHTML = '';
+          element.innerHTML = '<div class="spinner-border text-dark" role="status"><span class="visually-hidden">Loading...</span></div>';
+        });
+      }
+    }).render('#paypal-button-container');
+    // START RazorPay
+    var options = {
+      "key": "{{ RZP_KEY_ID }}", // Enter the Key ID generated from the Dashboard
+      "amount": "{{ rzp_amount }}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+      "currency": "INR",
+      "name": "The Shop", //your business name
+      "description": "Test Transaction",
+      "image": "{% static 'images/logo/logo.png' %}",
+      "order_id": "{{ rzp_order_id }}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+      "handler": function (response) {
+        // alert(response.razorpay_payment_id);
+        // alert(response.razorpay_order_id);
+        // alert(response.razorpay_signature);
+        const element = document.getElementById('razorpay-button-container');
+        element.innerHTML = '';
+        element.innerHTML = '<div class="spinner-border text-dark" role="status"><span class="visually-hidden">Loading...</span></div>';
+        var transaction_id = response.razorpay_payment_id
+        var status = 'COMPLETED'
+        var payment_method = 'razorpay'
+        sendTransaction(transaction_id, payment_method, status);
+      },
+      "callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
+      "prefill": { //We recommend using the prefill parameter to auto-fill customer's contact information especially their phone number
+        "name": "{{ order.name }}", //your customer's name
+        "email": "{{ order.email }}",
+        "contact": "{{ order.phone }}" //Provide the customer's phone number for better conversion rates 
+      },
+      "notes": {
+        "address": "{{ order.address }}"
+      },
+      "theme": {
+        "color": "#000000"
+      }
+    };
+    var rzp1 = new Razorpay(options);
+    document.getElementById('rzp-button1').onclick = function (e) {
+      rzp1.open();
+      e.preventDefault();
+    }
+    // END RazorPay
+    function sendTransaction(transaction_id, payment_method, status) {
+      $.ajax({
+        type: 'POST',
+        url: url,
+        data: {
+          'csrfmiddlewaretoken': csrftoken,
+          'order_number': order_number,
+          'transaction_id': transaction_id,
+          'payment_method': payment_method,
+          'status': status,
+        },
+        success: function (response) {
+          window.location.href = order_complete + '?order_number=' + response.order_number + '&transaction_id=' + response.transaction_id
+        }
+      })
+    }
+  </script>
+{% endblock content %}

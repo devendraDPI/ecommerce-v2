@@ -1,0 +1,10 @@
+<!-- START customer sidebar -->
+  <div class="col-md-2 p-3 bg-body-secondary">
+    <ul class="nav nav-pills flex-column mb-auto">
+      <li><a href="{% url 'customer-dashboard' %}" class="nav-link {% if '/account/customer-dashboard/' == request.path or '/account/customer/' == request.path %}text-light bg-dark{% else %}text-dark{% endif %}"><i class="bi bi-grid"></i> Dashboard</a></li>
+      <li><a href="{% url 'customer-orders' %}" class="nav-link {% if '/customer/my-orders/' in request.path or '/customer/order-details/' in request.path %}text-light bg-dark{% else %}text-dark{% endif %}"><i class="bi bi-cart-plus"></i> My orders</a></li>
+      <li><a href="{% url 'customer-profile' %}" class="nav-link {% if '/customer-profile/' in request.path %}text-light bg-dark{% else %}text-dark{% endif %}"><i class="bi bi-tools"></i> Profile settings</a></li>
+      <li><a href="{% url 'signout' %}" class="nav-link text-dark"><i class="bi bi-box-arrow-in-right"></i> Signout</a></li>
+    </ul>
+  </div>
+<!-- END customer sidebar -->

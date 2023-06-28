@@ -1,0 +1,16 @@
+<!-- START error -->
+  <div class="error-list">
+    {% for field in form %}
+      {% if field.errors %}
+        {% for error in field.errors %}
+          <li class="text-danger" style="list-style-type: none;">{{ error }}</li>
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
+    {% if form.non_field_errors %}
+      {% for error in form.non_field_errors %}
+        <li class="text-danger" style="list-style-type: none;">{{ error }}</li>
+      {% endfor %}
+    {% endif %}
+  </div>
+<!-- END error -->

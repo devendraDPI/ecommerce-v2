@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Create category{% endblock title %}
+{% load static %}
+{% block content %}
+  <div class="container-fluid">
+    {% include 'includes/vendor-cover.html' %}
+    <div class="row">
+      {% include 'includes/vendor-sidebar.html' %}
+      <div class="col-md-10">
+        <div class="container my-3">
+          {% include 'includes/back-button.html' %}
+          <h2 class="fw-normal"><b>Create category</b></h2><hr>
+          <form action="{% url 'add-category' %}" class="container col-md-8" method="POST"> {% csrf_token %}
+            <div class="form-floating">{{ form.name }}<label for="id_name">category name<span class="text-danger">*</span></label></div>
+            <div class="form-floating">{{ form.description }}<label for="id_description">description</label></div>
+            {% include 'includes/form-errors.html' %}
+            <div class="text-center my-5"><button class="btn btn-dark rounded-pill" type="submit"><i class="bi bi-check-circle"></i> Create</div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

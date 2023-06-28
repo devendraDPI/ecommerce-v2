@@ -1,0 +1,12 @@
+<!-- START vendor sidebar -->
+  <div class="col-md-2 p-3 bg-body-secondary">
+    <ul class="nav nav-pills flex-column mb-auto">
+      <li><a href="{% url 'vendor-dashboard' %}" class="nav-link {% if '/account/vendor-dashboard/' == request.path or '/account/vendor/' == request.path %}text-light bg-dark{% else %}text-dark{% endif %}"><i class="bi bi-grid"></i> Dashboard</a></li>
+      <li><a href="{% url 'vendor-orders' %}" class="nav-link {% if '/vendor/my-orders/' in request.path or '/vendor/order-details/' in request.path %}text-light bg-dark{% else %}text-dark{% endif %}"><i class="bi bi-cart-plus"></i> Orders</a></li>
+      <li><a href="{% url 'vendor-profile' %}" class="nav-link {% if '/vendor-profile/' in request.path %}text-light bg-dark{% else %}text-dark{% endif %}"><i class="bi bi-shop-window"></i> Shop profile</a></li>
+      <li><a href="{% url 'category' %}" class="nav-link {% if '/category/' in request.path or '/products-by-category/' in request.path %}text-light bg-dark{% else %}text-dark{% endif %}"><i class="bi bi-diagram-3"></i> Category/Product</a></li>
+      <li><a href="{% url 'operating-hours' %}" class="nav-link {% if '/operating-hours/' in request.path %}text-light bg-dark{% else %}text-dark{% endif %}"><i class="bi bi-clock"></i> Operating hours</a></li>
+      <li><a href="{% url 'signout' %}" class="nav-link text-dark"><i class="bi bi-box-arrow-in-right"></i> Signout</a></li>
+    </ul>
+  </div>
+<!-- END vendor sidebar -->

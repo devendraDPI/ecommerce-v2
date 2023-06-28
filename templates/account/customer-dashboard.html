@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock title %}
+{% block content %}
+  <div class="container-fluid">
+    {% include 'includes/customer-cover.html' %}
+    <div class="row">
+      {% include 'includes/customer-sidebar.html' %}
+      <div class="col-md-10">
+        <div class="container my-3">
+          <h2 class="mb-3 fw-normal"><b>Overview</b></h2><hr>
+          <div class="row">
+            <div class="col">
+              <div class="card text-center shadow-sm">
+                <div class="card-header bg-dark text-white"><b>Total Orders</b></div>
+                <div class="card-body"><a href="" class="text-dark" style="text-decoration: none;"><h5 class="card-title">{{ orders_count }}</h5></a></div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card text-center shadow-sm">
+                <div class="card-header bg-dark text-white"><b>{{ user.email }}</b></div>
+                <div class="card-body"><a href="{% url 'customer-profile' %}" class="text-dark" style="text-decoration: none;"><h5 class="card-title"><i class="bi bi-tools"></i> Edit profile</h5></a></div>
+              </div>
+            </div>
+          </div>
+          <h2 class="my-3 fw-normal"><b>Recent Orders</b></h2><hr>
+          <div class="container my-4">
+            <table class="table table-hover table-borderless" id="myTable" style="vertical-align: middle;">
+              <thead class="table-dark">
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Order Number</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Total</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for order in recent_orders %}
+                  <tr>
+                    <th>{{ forloop.counter }}</th>
+                    <th>{{ order.order_number }}</th>
+                    <td>{{ order.name }}</td>
+                    <td>₹{{ order.total|floatformat:2 }}</td>
+                    <td>{{ order.status }}</td>
+                    <td>{{ order.created_at }}</td>
+                    <td><a href="{% url 'order-details' order.order_number %}" class="btn btn-sm btn-dark rounded-pill">Details</a></td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

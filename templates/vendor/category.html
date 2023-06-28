@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Category/Product{% endblock title %}
+{% block content %}
+  <div class="container-fluid">
+    {% include 'includes/vendor-cover.html' %}
+    <div class="row">
+      {% include 'includes/vendor-sidebar.html' %}
+      <div class="col-md-10">
+        <div class="container my-3">
+          <h2 class="fw-normal"><b>Manage your categories</b></h2><hr>
+          {% if categories %}
+            <h4><b>Categories</b></h4>
+            <div class="float-end">
+              <a href="{% url 'add-category' %}" class="btn btn-outline-dark rounded-pill m-2" style="border-style: none;"><i class="bi bi-plus-circle"></i> Add category</a>
+            </div>
+            <table class="table table-hover table-borderless">
+              <thead class="table-dark text-center">
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Category</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody class="text-center" style="vertical-align: middle;">
+                {% for category in categories %}
+                  <tr>
+                    <td>
+                      {{ forloop.counter }}
+                    </td>
+                    <td>
+                      <a href="{% url 'products-by-category' category.id %}" class="text-dark" style="text-decoration: none;"><b>{{ category.name }}</b><br><small class="text-muted">{{ category.description|truncatechars:"250" }}</small></a>
+                    </td>
+                    <td>
+                      <a href="{% url 'edit-category' category.id %}" style="color: unset;"><i class="bi bi-pencil-square"></i></a>
+                      <a href="{% url 'delete-category' category.id %}" style="color: unset;" onclick="return confirm('Are you sure you want to delete?')"><i class="bi bi-trash text-danger"></i></a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            <div class="text-center">
+              <h5 class="text-center">No category found</h5>
+              <a href="{% url 'add-category' %}" class="btn btn-outline-dark rounded-pill m-2" style="border-style: none;"><i class="bi bi-plus-circle"></i> Add category</a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

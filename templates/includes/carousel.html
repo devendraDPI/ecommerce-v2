@@ -1,0 +1,39 @@
+{% load static %}
+<!-- START carousel -->
+  <div id="carouselCaptions" class="carousel slide">
+    <div class="carousel-indicators">
+      <button type="button" data-bs-target="#carouselCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 0"></button>
+      {% for vendor in featured_vendors %}
+        <button type="button" data-bs-target="#carouselCaptions" data-bs-slide-to="{{ forloop.counter }}" aria-label="Slide {{ forloop.counter }}"></button>
+      {% endfor %}
+    </div>
+    <div class="carousel-inner">
+      <div class="carousel-item active mb-3">
+        <img src="{% static 'images/carousel/carousel.jpg' %}" class="d-block w-100 rounded" alt="The shop features" height="350px" width="100%" style="filter: brightness(50%);">
+        <div class="carousel-caption d-none d-md-block">
+          <h1 class="display-4">The Shop</h1>
+          <h5 class="display-8">Welcome to The Shop!</h5>
+          <p class="lead my-3">We're thrilled to have you here.</p>
+        </div>
+      </div>
+      {% for vendor in featured_vendors %}
+        <div class="carousel-item mb-3">
+          <img src="{{ vendor.user_profile.cover_image.url }}" class="d-block w-100 rounded" alt="Featured vendor image" height="350px" width="100%" style="filter: brightness(50%);">
+          <div class="carousel-caption d-none d-md-block">
+            <img src="{{ vendor.user_profile.profile_image.url }}" alt="profile image" width="10%" class="rounded-pill"><br>
+            <a href="{% url 'vendor-details' vendor.slug %}" class="text-white" style="text-decoration: none;"><h1 class="display-4 fst-italic">{{ vendor.name|truncatechars:30 }}</h1></a>
+            {% if vendor.user_profile.address %}<p><i class="bi bi-geo-alt"></i> {{ vendor.user_profile.address }}</p>{% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselCaptions" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselCaptions" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+<!-- END carousel -->
